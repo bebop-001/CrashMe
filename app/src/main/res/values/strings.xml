@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CrashMe</string>
+    <string name="permission_storage">
+        If you want to send crash dump information via email,
+        the crash dump must be in external memory for the
+        email app to access it.  Do you want to enable this feature?
+    </string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+</resources>
