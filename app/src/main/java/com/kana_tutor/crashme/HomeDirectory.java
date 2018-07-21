@@ -27,6 +27,7 @@ import android.content.pm.PackageManager;
 import android.support.v7.app.AlertDialog;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 import static android.content.pm.PackageManager.*;
 import static android.Manifest.permission.*;
@@ -113,7 +114,7 @@ public class HomeDirectory {
                 + "UserPreferences", Context.MODE_PRIVATE);
         if (homeDirPath.equals("")) {
             PackageInfo packageInfo;
-            // Make sure we asked for the WRITE_EXTERNAL permission.
+            // Make sure we asked for the WRITE_EXTERNAL permission in the manifest.
             boolean writeRequested = false;
             try {
                 packageInfo = activity.getPackageManager().getPackageInfo(
@@ -126,6 +127,19 @@ public class HomeDirectory {
             catch (NameNotFoundException e) {
                 e.printStackTrace();
             }
+            // make sure main activity has onRequestPermissionsResult implemented
+            // or memory will never complete for M+ versions of android.
+            boolean implementedOK = false;
+            Class activityClass = activity.getClass();
+            Method[] methods = activityClass.getMethods();
+            for (int i = 0; i < methods.length && !implementedOK; i++)
+                implementedOK = methods[i].getName()
+                    .equals("onRequestPermissionsResult");
+            if ( !implementedOK)
+                throw new RuntimeException(
+                    "Method \"onRequestPermissionsResult\" needs "
+                    + "to be implemented in calling activity.");
+
             /*
              * if this is the case, we must request permision from the
              * OS, the OS replies yes/no in main/onRequestPermissionsResult
