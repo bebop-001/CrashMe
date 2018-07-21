@@ -132,9 +132,11 @@ public class HomeDirectory {
             boolean implementedOK = false;
             Class activityClass = activity.getClass();
             Method[] methods = activityClass.getMethods();
-            for (int i = 0; i < methods.length && !implementedOK; i++)
-                implementedOK = methods[i].getName()
-                    .equals("onRequestPermissionsResult");
+            for (int i = 0; i < methods.length && !implementedOK; i++) {
+                Method m = methods[i];
+                implementedOK = m.getName().equals("onRequestPermissionsResult")
+                        && m.getDeclaringClass() == activityClass;
+            }
             if ( !implementedOK)
                 throw new RuntimeException(
                     "Method \"onRequestPermissionsResult\" needs "
