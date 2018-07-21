@@ -140,7 +140,7 @@ public class HomeDirectory {
             if ( !implementedOK)
                 throw new RuntimeException(
                     "Method \"onRequestPermissionsResult\" needs "
-                    + "to be implemented in calling"
+                    + "to be implemented in "
                     + activityClass.getSimpleName() + ".");
 
             /*
