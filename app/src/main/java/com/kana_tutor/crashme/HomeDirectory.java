@@ -115,6 +115,7 @@ public class HomeDirectory {
         if (homeDirPath.equals("")) {
             PackageInfo packageInfo;
             // Make sure we asked for the WRITE_EXTERNAL permission in the manifest.
+            // <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
             boolean writeRequested = false;
             try {
                 packageInfo = activity.getPackageManager().getPackageInfo(
@@ -127,8 +128,17 @@ public class HomeDirectory {
             catch (NameNotFoundException e) {
                 e.printStackTrace();
             }
-            // make sure main activity has onRequestPermissionsResult implemented
-            // or memory will never complete for M+ versions of android.
+            /*
+             * make sure main activity has onRequestPermissionsResult implemented
+             * or memory will never complete for M+ versions of android.  Your callback
+             * should look like:
+             * @Override
+             * public void onRequestPermissionsResult(
+             * int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+             *     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+             *     homeDirectory = new HomeDirectory(this);
+             * }
+             */
             boolean implementedOK = false;
             Class activityClass = activity.getClass();
             Method[] methods = activityClass.getMethods();
