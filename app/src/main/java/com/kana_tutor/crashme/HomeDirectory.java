@@ -24,16 +24,15 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import java.io.File;
 
-import static android.support.v4.app.ActivityCompat.*;
+import static android.content.pm.PackageManager.*;
 import static android.Manifest.permission.*;
 import static android.os.Build.*;
-import static android.content.pm.PackageManager.*;
 import static android.os.Environment.*;
+import static android.support.v4.app.ActivityCompat.*;
 
 /*
  *  Allow the user to select whether the home directory used by the
