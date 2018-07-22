@@ -19,6 +19,7 @@ package com.kana_tutor.crashme;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -36,6 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static android.os.Process.killProcess;
+import static android.os.Process.myPid;
 
 public class CrashLog
         implements Thread.UncaughtExceptionHandler {
@@ -87,12 +91,21 @@ public class CrashLog
         catch (IOException e1) {
             e1.printStackTrace();
         }
-        if(android.os.Build.VERSION.SDK_INT >= 21)
-            activity.finishAndRemoveTask();
-        else
-            activity.finish();
-        t.destroy();
-        System.exit(1);
+        /*
+         * I tried finish/finishAndRemoveTask() and task.destroy()
+         * and even System.exit() to exit this thread handler.  In
+         * every case the app the app wouldn't restart correctly
+         * afterward.  I noticed ps showed the app was still active in
+         * 'S' suspended state.  I found a thread on stackexchange
+         * that said
+         * "When you use the finish() method, it does not
+         * close the process completely , it is STILL working
+         * in background." so tried killing the app process and
+         * that fixed the problem.
+         * (see: https://stackoverflow.com/questions/3105673
+         *     /how-to-kill-an-application-with-all-its-activities)
+         */
+        killProcess(myPid());
     }
 
     private List<File> getLogs() {
