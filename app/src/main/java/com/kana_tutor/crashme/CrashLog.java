@@ -97,14 +97,18 @@ public class CrashLog
 
     private List<File> getLogs() {
         List<File> files = new ArrayList<>();
-        for (File f : new File(HomeDirectory.getPath()).listFiles()) {
-            String baseName = f.getName();
-            if (baseName.startsWith("CrashLog.") && baseName.endsWith((".txt"))) {
-                int start = baseName.indexOf('.'), end = baseName.lastIndexOf('.');
-                if (start > 0 && end > 0 && start != end) {
-                    String dateStamp = baseName.substring(start + 1, end);
-                    if (dateStamp.matches("\\d{4}-\\d{2}-\\d{2}.\\d{2}")) {
-                        files.add(f);
+        String homeDir = HomeDirectory.getPath();
+        File[] logFiles = new File(homeDir).listFiles();
+        if (logFiles != null) {
+            for (File f : logFiles) {
+                String baseName = f.getName();
+                if (baseName.startsWith("CrashLog.") && baseName.endsWith((".txt"))) {
+                    int start = baseName.indexOf('.'), end = baseName.lastIndexOf('.');
+                    if (start > 0 && end > 0 && start != end) {
+                        String dateStamp = baseName.substring(start + 1, end);
+                        if (dateStamp.matches("\\d{4}-\\d{2}-\\d{2}.\\d{2}")) {
+                            files.add(f);
+                        }
                     }
                 }
             }
