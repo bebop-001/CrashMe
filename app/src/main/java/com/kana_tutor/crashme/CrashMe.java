@@ -1,34 +1,56 @@
+/*
+ *  Copyright 2018 Steven Smith kana-tutor.com
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *
+ *  You may obtain a copy of the License at
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ *  either express or implied.
+ *
+ *  See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
+/*
+ *  Copyright 2018 Steven Smith kana-tutor.com
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *
+ *  You may obtain a copy of the License at
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ *  either express or implied.
+ *
+ *  See the License for the specific language governing permissions
+ *  and limitations under the License.
+ */
 package com.kana_tutor.crashme;
-
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Map;
 
 public class CrashMe extends AppCompatActivity
-        implements Thread.UncaughtExceptionHandler
-        , View.OnClickListener {
+        implements View.OnClickListener {
     private static final String TAG = CrashMe.class.getSimpleName();
-    private static final String DMP_FILENAME = "CrashDump.txt";
-
-    private HomeDirectory homeDirectory;
-    public static String homeDirPath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crash_me);
+        Log.d(TAG, "onCreate:start");
 
         // catch any unhandled file and save the stack trace.
         // Thread.setDefaultUncaughtExceptionHandler(this);
@@ -36,9 +58,20 @@ public class CrashMe extends AppCompatActivity
         Button crash = findViewById(R.id.crash_me);
         crash.setOnClickListener(this);
 
-        homeDirPath = new HomeDirectory(CrashMe.this).getPath();
+        new HomeDirectory(this);
+
+        CrashLog crashLog = new CrashLog(this);
+        Thread.setDefaultUncaughtExceptionHandler(new CrashLog(this));
+        @SuppressWarnings("unused") Map<String, String> crashes = crashLog.getCrashes();
+        String latestCrash = crashLog.getLatestCrash();
+
+        TextView crashView = findViewById(R.id.latest_crash);
+        crashView.setText(latestCrash);
+        Log.d(TAG, "onCreate:end");
+
     }
 
+    @SuppressWarnings("UnusedAssignment")
     @Override
     public void onClick(View v) {
         // Crash!
@@ -50,39 +83,6 @@ public class CrashMe extends AppCompatActivity
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(TAG, "onRequestPermissionsResult");
-        homeDirectory = new HomeDirectory(this);
-    }
-    // catch any unhandled file and save the stack trace.
-    @Override
-    public void uncaughtException(Thread t, Throwable e) {
-        String timestamp = new SimpleDateFormat("MM-dd HH:mm:ss.SSS")
-                .format(System.currentTimeMillis());
-        DateFormat formatter = new SimpleDateFormat("MM-dd HH:mm:ss.SSS");
-        try {
-            // printStackTrace only works with PrintWriter.  Work-around
-            // to get a string stacktrace is to lit PrintWriter wrap a
-            // StringWriter and dump that using toString().
-            StringWriter errors = new StringWriter();
-            PrintWriter pw = new PrintWriter(errors);
-            pw.print(timestamp + " ");
-            e.printStackTrace(new PrintWriter(errors));
-            String stackTrace = errors.toString();
-
-
-
-            pw = new PrintWriter(new OutputStreamWriter(
-                    openFileOutput(DMP_FILENAME, MODE_APPEND)));
-            pw.print(timestamp + " ");
-            e.printStackTrace(pw);
-            pw.flush();
-            pw.close();
-            File f = new File(getFilesDir() + "/" + DMP_FILENAME);
-            String lastModified = new Date(f.lastModified()).toString();
-
-        } catch (FileNotFoundException e1) {
-            // do nothing
-        }
-        CrashMe.this.finish();
+        new HomeDirectory(this);
     }
 }

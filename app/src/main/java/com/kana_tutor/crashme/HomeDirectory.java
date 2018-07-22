@@ -55,52 +55,51 @@ public class HomeDirectory {
     public static boolean isExternal() {
         return useExternalMemory;
     }
-
     private void makeHomeDir(Activity activity, File homeDir, boolean external) {
-        File f = new File(homeDir.getPath() + "/" + activity.getString(R.string.app_name));
+        File f = new File(homeDir.getPath()
+            + String.format("/%s/", activity.getString(R.string.app_name)));
         if (!f.exists())
             if (!f.mkdir())
                 throw new RuntimeException("Failed to make directory:" + f.getAbsoluteFile());
-        homeDirPath = f.getAbsolutePath();
+        homeDirPath = f.getAbsolutePath() + "/";
         // and update the preferences.
         userPreferences.edit()
             .putString("homeDirPath", homeDirPath)
-            .putBoolean("homeDirPath", external)
+            .putBoolean("useExternalMemory", external)
             .apply();
     }
 
     private void setHomeDirPath(final Activity activity) {
-    new AlertDialog.Builder(activity)
-        .setMessage(R.string.permission_storage)
-        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                homeDirPath = activity.getFilesDir().toString();
-                makeHomeDir(activity, activity.getFilesDir(), false);
-            }
-        })
-        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (VERSION.SDK_INT >= VERSION_CODES.M) {
-                    /*
-                     * if this is the case, we must request permision from the
-                     * OS, the OS replies yes/no in main/onRequestPermissionsResult
-                     * which calls the HomeDirectory class which checks for request
-                     * pending, then checks results and sets the home directory path
-                     * accordigly.
-                     */
-                    requestPermissions(activity,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        1);
-                    requestPermissionPending = true;
+        new AlertDialog.Builder(activity)
+            .setMessage(R.string.permission_storage)
+            .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    makeHomeDir(activity, activity.getFilesDir(), false);
                 }
-                // pre Marshmallo, as long as you're here, it's all good.
-                else
-                    makeHomeDir(activity, getExternalStorageDirectory(), false);
-            }
-        })
-        .show();
+            })
+            .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (VERSION.SDK_INT >= VERSION_CODES.M) {
+                        /*
+                         * if this is the case, we must request permision from the
+                         * OS, the OS replies yes/no in main/onRequestPermissionsResult
+                         * which calls the HomeDirectory class which checks for request
+                         * pending, then checks results and sets the home directory path
+                         * accordigly.
+                         */
+                        requestPermissions(activity,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            1);
+                        requestPermissionPending = true;
+                    }
+                    // pre Marshmallo, as long as you're here, it's all good.
+                    else
+                        makeHomeDir(activity, getExternalStorageDirectory(), false);
+                }
+            })
+            .show();
     }
     private boolean stringsContain(String[] strings, String query) {
         boolean doesContain = false;
