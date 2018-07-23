@@ -8,3 +8,12 @@
 /build
 /captures
 .externalNativeBuild
+*.swp
+*/*.swp
+.idea/caches/
+.idea/codeStyles/
+.idea/misc.xml
+.idea/vcs.xml
+app/proguard-rules.pro
+tags
+
