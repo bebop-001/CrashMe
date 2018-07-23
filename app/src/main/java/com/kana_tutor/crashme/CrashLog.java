@@ -19,7 +19,6 @@ package com.kana_tutor.crashme;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -96,7 +95,7 @@ public class CrashLog
          * and even System.exit() to exit this thread handler.  In
          * every case the app the app wouldn't restart correctly
          * afterward.  I noticed ps showed the app was still active in
-         * 'S' suspended state.  I found a thread on stackexchange
+         * 'S' suspended state.  I found a thread on stack overflow
          * that said
          * "When you use the finish() method, it does not
          * close the process completely , it is STILL working
@@ -108,7 +107,7 @@ public class CrashLog
         killProcess(myPid());
     }
 
-    private List<File> getLogs() {
+    private static List<File> getLogs() {
         List<File> files = new ArrayList<>();
         String homeDir = HomeDirectory.getPath();
         File[] logFiles = new File(homeDir).listFiles();
@@ -128,13 +127,13 @@ public class CrashLog
         }
         return files;
     }
-    private String getLogTag(File logFile) {
+    private static String getLogTagFromFile(File logFile) {
         String baseName = logFile.getName();
         int start = baseName.indexOf('.'), end = baseName.lastIndexOf('.');
         return baseName.substring(start +  1, end);
     }
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private String getLog (File logFile) {
+    private static String getLog (File logFile) {
         String rv = "";
         try {
             FileInputStream is = new FileInputStream(logFile);
@@ -152,15 +151,15 @@ public class CrashLog
         return rv;
     }
 
-    public Map<String, String> getCrashes() {
+    public static Map<String, String> getCrashes() {
         Map<String, String> crashes = new HashMap<>();
         List<File> logs = getLogs();
         for (File logFile : logs) {
-            crashes.put(getLogTag(logFile), getLog(logFile));
+            crashes.put(getLogTagFromFile(logFile), getLog(logFile));
         }
         return crashes;
     }
-    public String getLatestCrash() {
+    public static String getLatestCrash() {
         String rv = "";
         List<File> logs = getLogs();
         if (logs.size() > 0) {
@@ -168,6 +167,18 @@ public class CrashLog
             rv = getLog(logs.get(logs.size() - 1));
         }
         return rv;
+    }
+    // Remove all the log files.  Throw a runtime error
+    // if removal fails.
+    public static int unlinkLogFiles() {
+        List<File> logs = getLogs();
+        for (File log : logs) {
+            if( !log.delete())
+                throw new RuntimeException(
+                    "Failed to unlink logfile " + log.getAbsoluteFile()
+                );
+        }
+        return logs.size();
     }
 
     CrashLog(Activity activity) {

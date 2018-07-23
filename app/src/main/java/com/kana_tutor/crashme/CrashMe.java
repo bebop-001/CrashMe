@@ -38,13 +38,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Map;
+import static android.widget.Toast.*;
 
-public class CrashMe extends AppCompatActivity
-        implements View.OnClickListener {
+public class CrashMe extends AppCompatActivity {
     private static final String TAG = CrashMe.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,28 +53,42 @@ public class CrashMe extends AppCompatActivity
         // catch any unhandled file and save the stack trace.
         // Thread.setDefaultUncaughtExceptionHandler(this);
 
-        Button crash = findViewById(R.id.crash_me);
-        crash.setOnClickListener(this);
-
         new HomeDirectory(this);
+        new CrashLog(this);
 
-        CrashLog crashLog = new CrashLog(this);
         Thread.setDefaultUncaughtExceptionHandler(new CrashLog(this));
-        @SuppressWarnings("unused") Map<String, String> crashes = crashLog.getCrashes();
-        String latestCrash = crashLog.getLatestCrash();
+        // Map<String, String> crashes = crashLog.getCrashes();
 
-        TextView crashView = findViewById(R.id.latest_crash);
-        crashView.setText(latestCrash);
-        Log.d(TAG, "onCreate:end");
+        final TextView crashView = findViewById(R.id.latest_crash);
 
-    }
-
-    @SuppressWarnings("UnusedAssignment")
-    @Override
-    public void onClick(View v) {
-        // Crash!
-        int x = 1;
-        x /= 0;
+        findViewById(R.id.crash_me).setOnClickListener(new View.OnClickListener() {
+            @SuppressWarnings("UnusedAssignment")
+            @Override
+            public void onClick(View v) {
+                int x = 99;
+                x /= 0;
+            }
+        });
+        findViewById(R.id.show_most_recent_crash)
+                .setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String latestCrash = CrashLog.getLatestCrash();
+                if (latestCrash.length() > 0) {
+                    crashView.setText(latestCrash);
+                }
+            }
+        });
+        findViewById(R.id.unlink_log_files).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int unlinkCount = CrashLog.unlinkLogFiles();
+                makeText(CrashMe.this
+                        , "Removed " + unlinkCount + " log files.", LENGTH_LONG)
+                    .show();
+                crashView.setText("");
+            }
+        });
     }
 
     @Override
