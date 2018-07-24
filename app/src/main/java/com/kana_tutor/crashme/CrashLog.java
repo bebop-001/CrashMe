@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static android.os.Process.killProcess;
 import static android.os.Process.myPid;
@@ -62,8 +63,12 @@ public class CrashLog
     // catch any unhandled file and save the stack trace.
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        String crashTimestamp = new SimpleDateFormat("MM-dd HH:mm:ss.SSS 'GMT'",
-                    Locale.UK).format(System.currentTimeMillis());
+        SimpleDateFormat fmt = new SimpleDateFormat("MM-dd HH:mm:ss.SSS z '(GMT'Z')'",
+                Locale.getDefault());
+        // output GMT
+        // SimpleDateFormat gmtFmt = (SimpleDateFormat) fmt.clone();
+        // gmtFmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+
         File crashFile = getCrashFile();
         try {
             // printStackTrace only works with PrintWriter.  Work-around
@@ -71,7 +76,7 @@ public class CrashLog
             // StringWriter and dump that using toString().
             StringWriter errors = new StringWriter();
             PrintWriter pw = new PrintWriter(errors);
-            pw.print(crashTimestamp + "\n");
+            pw.print(fmt.format(System.currentTimeMillis()) + "\n");
             e.printStackTrace(new PrintWriter(errors));
             String stackTrace = errors.toString();
 
@@ -86,7 +91,8 @@ public class CrashLog
             );
         }
         catch (FileNotFoundException e1) {
-            e1.printStackTrace();        }
+            e1.printStackTrace();
+        }
         catch (IOException e1) {
             e1.printStackTrace();
         }
@@ -104,6 +110,7 @@ public class CrashLog
          * (see: https://stackoverflow.com/questions/3105673
          *     /how-to-kill-an-application-with-all-its-activities)
          */
+        Log.d(TAG, "Crashlog: kill ps " + myPid());
         killProcess(myPid());
     }
 
@@ -150,7 +157,13 @@ public class CrashLog
         }
         return rv;
     }
-
+    public static String [] getLogNames() {
+        List<File> logs = getLogs();
+        String[] rv = new String[logs.size()];
+        for (int i = 0; i < logs.size(); i++)
+            rv[i] = logs.get(i).getName();
+        return rv;
+    }
     public static Map<String, String> getCrashes() {
         Map<String, String> crashes = new HashMap<>();
         List<File> logs = getLogs();

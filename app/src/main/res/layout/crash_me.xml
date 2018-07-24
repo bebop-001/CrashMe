@@ -15,10 +15,10 @@
         />
 
     <Button
-        android:id="@+id/show_most_recent_crash"
+        android:id="@+id/unlink_log_files"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Show most recent crash" />
+        android:text="Delete log files" />
 
     <TextView
         android:id="@+id/latest_crash"
@@ -28,11 +28,5 @@
         android:text="Latest crash"
         android:textSize="15sp"
         android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/unlink_log_files"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Delete log files" />
 
 </LinearLayout>
