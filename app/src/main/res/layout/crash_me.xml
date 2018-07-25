@@ -20,13 +20,17 @@
         android:layout_height="wrap_content"
         android:text="Delete log files" />
 
-    <TextView
-        android:id="@+id/latest_crash"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Latest crash"
-        android:textSize="15sp"
-        android:textStyle="bold" />
+        android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/latest_crash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Latest crash"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </ScrollView>
 </LinearLayout>

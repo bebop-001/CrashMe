@@ -19,6 +19,8 @@ package com.kana_tutor.crashme;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -111,6 +113,10 @@ public class CrashLog
          *     /how-to-kill-an-application-with-all-its-activities)
          */
         Log.d(TAG, "Crashlog: kill ps " + myPid());
+        if (Build.VERSION.SDK_INT > 21)
+            activity.finishAndRemoveTask();
+        else
+            activity.finishActivity(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         killProcess(myPid());
     }
 
