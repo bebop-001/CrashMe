@@ -1,11 +1,21 @@
 Sun Jul 22 17:32:32 PDT 2018
 
+keywords: android logcat Thread.UncaughtExceptionHandler
+keywords: Thread.setDefaultUncaughtExceptionHandler
+keywords: android.permission.WRITE_EXTERNAL_STORAGE
+keywords: checkSelfPermission onRequestPermissionsResult
+
 I have an app that sometimes dies several hours after being
 started if its on the backstack and was having a hard time
-catching the crash dump.  I needed something to catch the
-exceptions for later review and this is a feature I have
-needed in the past to.  My solution is the CrashLog in
-this demo.
+catching the crash dump.  I could run logcat on the device
+using a terminal and logcat as a process on the app but
+as it turns out, output from logcat is extremely limited
+unless you have a root'ed device.
+
+I needed something to catch the stack trace from the
+exception for later review and this is a something I have
+needed in the past to.  My solution is the CrashLog
+class in this demo.
 
 I also like putting things under one directory and being
 an old unix guy, I like the idea of a home directory.
